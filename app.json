@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-course",
-    "slug": "react-native-course",
+    "name": "My First App",
+    "slug": "MFA",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
