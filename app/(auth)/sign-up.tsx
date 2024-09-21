@@ -4,6 +4,8 @@ import { FormField } from "@/components/FormField";
 import { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import { Link } from "expo-router";
+import { signUpScheme } from "../schemes/login";
+import { z } from "zod";
 
 export type SignUpForm = {
   username: string;
@@ -18,10 +20,23 @@ const SignUp = () => {
     password: "",
   });
 
+  const [errors, setErrors] =
+    useState<{ name: string | number; message: string }[]>();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitForm = () => {
-    console.log(form);
+    try {
+      signUpScheme.parse(form);
+      console.log(form);
+      setErrors(undefined);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setErrors(
+          error.errors.map((e) => ({ name: e.path[0], message: e.message }))
+        );
+      }
+    }
   };
 
   return (
@@ -41,6 +56,9 @@ const SignUp = () => {
             value={form.username}
             handleChangeText={(e: string) => setForm({ ...form, username: e })}
             otherStyles="mt-10"
+            errorText={
+              errors?.find((e) => e.name === "username")?.message || ""
+            }
           />
           <FormField
             title="Email"
@@ -48,12 +66,16 @@ const SignUp = () => {
             handleChangeText={(e: string) => setForm({ ...form, email: e })}
             otherStyles="mt-7"
             keyboardType="email-address"
+            errorText={errors?.find((e) => e.name === "email")?.message || ""}
           />
           <FormField
             title="Password"
             value={form.password}
             handleChangeText={(e) => setForm({ ...form, password: e })}
             otherStyles="mt-7"
+            errorText={
+              errors?.find((e) => e.name === "password")?.message || ""
+            }
           />
           <CustomButton
             title="Sign In"

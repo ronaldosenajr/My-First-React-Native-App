@@ -6,6 +6,7 @@ type FormFieldProps = {
   title: string;
   value: string;
   placeholder?: string;
+  errorText?: string;
   handleChangeText: (text: string) => void;
   otherStyles?: string;
   keyboardType?: "email-address" | "default" | "numeric" | "phone-pad";
@@ -14,6 +15,7 @@ type FormFieldProps = {
 export const FormField: React.FC<FormFieldProps> = ({
   title,
   value,
+  errorText,
   handleChangeText,
   otherStyles,
   keyboardType,
@@ -49,6 +51,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           </TouchableOpacity>
         )}
       </View>
+      <Text className="text-red-500 font-pregular text-base">{errorText}</Text>
     </View>
   );
 };
