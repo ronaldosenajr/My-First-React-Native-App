@@ -1,11 +1,19 @@
-import { View, Text, SafeAreaView, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  Image,
+  Alert,
+} from "react-native";
 import { images } from "@/constants";
 import { FormField } from "@/components/FormField";
 import { useState } from "react";
 import CustomButton from "@/components/CustomButton";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { signInScheme } from "../schemes/login";
 import { z } from "zod";
+import { checkActiveSession, deleteSessions, signIn } from "@/lib/appwrite";
 
 export type SignInForm = {
   email: string;
@@ -23,17 +31,30 @@ const SignIn = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submitForm = () => {
+  const submitForm = async () => {
     try {
       signInScheme.parse(form);
-      console.log(form);
+      setIsSubmitting(true);
       setErrors(undefined);
+      const activeSession = await checkActiveSession();
+      if (activeSession) {
+        await deleteSessions();
+      }
+      const result = await signIn(form.email, form.password);
+
+      // set result to global state
+
+      router.replace("/home");
     } catch (error) {
       if (error instanceof z.ZodError) {
         setErrors(
           error.errors.map((e) => ({ name: e.path[0], message: e.message }))
         );
+      } else {
+        Alert.alert("Error", "Oops, something went wrong. Please try again.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
