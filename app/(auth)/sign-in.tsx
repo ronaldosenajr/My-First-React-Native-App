@@ -13,7 +13,8 @@ import CustomButton from "@/components/CustomButton";
 import { Link, router } from "expo-router";
 import { signInScheme } from "../schemes/login";
 import { z } from "zod";
-import { checkActiveSession, deleteSessions, signIn } from "@/lib/appwrite";
+import { getCurrentUser, signIn } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 export type SignInForm = {
   email: string;
@@ -26,6 +27,8 @@ const SignIn = () => {
     password: "",
   });
 
+  const { setIsLoggedIn, setUser } = useGlobalContext();
+
   const [errors, setErrors] =
     useState<{ name: string | number; message: string }[]>();
 
@@ -36,11 +39,11 @@ const SignIn = () => {
       signInScheme.parse(form);
       setIsSubmitting(true);
       setErrors(undefined);
-      const activeSession = await checkActiveSession();
-      if (activeSession) {
-        await deleteSessions();
-      }
-      const result = await signIn(form.email, form.password);
+      await signIn(form.email, form.password);
+      const result = await getCurrentUser();
+
+      setUser(result);
+      setIsLoggedIn(true);
 
       // set result to global state
 

@@ -14,6 +14,7 @@ import { Link, router } from "expo-router";
 import { signUpScheme } from "../schemes/login";
 import { z } from "zod";
 import { createUser } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 export type SignUpForm = {
   username: string;
@@ -32,6 +33,7 @@ const SignUp = () => {
     useState<{ name: string | number; message: string }[]>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setIsLoggedIn, setUser } = useGlobalContext();
 
   const submitForm = async () => {
     try {
@@ -39,6 +41,8 @@ const SignUp = () => {
       setIsSubmitting(true);
       setErrors(undefined);
       const result = await createUser(form.email, form.password, form.username);
+      setUser(result);
+      setIsLoggedIn(true);
 
       // set result to global state
 
